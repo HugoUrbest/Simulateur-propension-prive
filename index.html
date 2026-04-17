@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur — Propension à choisir l'école privée | Urbest</title>
+<style>
+  :root {
+    --navy: #0D1B2A; --navy-mid: #1A2E42; --navy-l: #243B55;
+    --gold: #C8A96E; --gold-l: #E2C99A; --gold-pale: #F5EDD8;
+    --green: #2D6A4F; --white: #FFFFFF; --off-w: #F8F6F1;
+    --gray-l: #EEE9DF; --gray-m: #C4BBA8; --gray-d: #4A4238;
+    --c1: #534AB7; --c2: #0F6E56; --c3: #185FA5; --c4: #993C1D; --c5: #854F0B;
+    --r: 10px; --rs: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, 'Times New Roman', serif; background: var(--off-w); color: var(--gray-d); min-height: 100vh; }
+  header { background: var(--navy); padding: 1.4rem 2.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--gold); }
+  .logo { font-family: Arial, sans-serif; font-size: 22px; font-weight: 700; color: var(--white); letter-spacing: .04em; }
+  .logo span { color: var(--gold); }
+  .htag { font-family: Arial, sans-serif; font-size: 11px; color: var(--gold-l); letter-spacing: .12em; text-transform: uppercase; }
+  .hero { background: var(--navy-mid); padding: 2rem 2.5rem 1.6rem; border-bottom: 1px solid var(--navy-l); }
+  .hero h1 { font-size: 24px; font-weight: normal; color: var(--white); line-height: 1.35; max-width: 680px; margin-bottom: .5rem; }
+  .hero h1 em { color: var(--gold); font-style: normal; }
+  .hero p { font-family: Arial, sans-serif; font-size: 13px; color: var(--gray-m); max-width: 680px; line-height: 1.6; }
+  .disc { background: var(--navy-l); border-left: 3px solid var(--gold); padding: .65rem 1.1rem; margin-top: 1rem; border-radius: 0 var(--rs) var(--rs) 0; max-width: 680px; font-family: Arial, sans-serif; font-size: 11px; color: var(--gold-l); line-height: 1.5; }
+  main { max-width: 1100px; margin: 0 auto; padding: 1.8rem 2.5rem; display: grid; grid-template-columns: 1fr 330px; gap: 2rem; align-items: start; }
+  .stitle { font-family: Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gray-m); margin-bottom: .9rem; padding-bottom: .4rem; border-bottom: 1px solid var(--gray-l); }
+  .pgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-bottom: 1.8rem; }
+  .pbtn { background: var(--white); border: 1px solid var(--gray-l); border-radius: var(--rs); padding: .6rem .8rem; font-family: Arial, sans-serif; font-size: 12px; color: var(--gray-d); cursor: pointer; text-align: left; line-height: 1.3; transition: all .15s; }
+  .pbtn:hover { border-color: var(--gold); color: var(--navy); }
+  .pbtn.active { background: var(--navy); border-color: var(--navy); color: var(--gold-l); }
+  .pbtn .pi { font-size: 15px; display: block; margin-bottom: 3px; }
+  .flist { display: flex; flex-direction: column; gap: 1.2rem; }
+  .fc { background: var(--white); border: 1px solid var(--gray-l); border-radius: var(--r); padding: 1.1rem 1.3rem .9rem; }
+  .ftop { display: flex; align-items: center; justify-content: space-between; margin-bottom: .7rem; }
+  .fn { font-family: Arial, sans-serif; font-size: 13px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 7px; }
+  .fw { font-family: Arial, sans-serif; font-size: 10px; color: var(--white); padding: 2px 7px; border-radius: 20px; }
+  .fsd { font-family: Arial, sans-serif; font-size: 18px; font-weight: 700; color: var(--navy); min-width: 42px; text-align: right; }
+  .fbt { height: 5px; background: var(--gray-l); border-radius: 3px; overflow: hidden; margin-bottom: .9rem; }
+  .fbf { height: 100%; border-radius: 3px; transition: width .25s; }
+  .dgrid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem 1.4rem; }
+  .dim { display: flex; flex-direction: column; gap: 3px; }
+  .dlbl { font-family: Arial, sans-serif; font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 1px; }
+  .drow { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1px; }
+  .dq { font-family: Arial, sans-serif; font-size: 12px; font-weight: 700; color: var(--navy); }
+  .dp { font-family: Arial, sans-serif; font-size: 11px; color: var(--gray-m); }
+  input[type=range] { width: 100%; accent-color: var(--navy); cursor: pointer; }
+  .sticks { display: flex; justify-content: space-between; margin-top: 3px; }
+  .st { font-family: Arial, sans-serif; font-size: 10px; color: var(--gray-m); }
+  .st.med { color: var(--gray-d); font-weight: 700; }
+  .rp { position: sticky; top: 1.5rem; }
+  .scard { background: var(--navy); border-radius: var(--r); padding: 1.5rem; margin-bottom: 1rem; border: 1px solid var(--navy-l); }
+  .smain { text-align: center; padding: 1rem 0 .8rem; }
+  .snum { font-size: 60px; font-weight: normal; color: var(--gold); line-height: 1; font-family: Georgia, serif; }
+  .slbl { font-family: Arial, sans-serif; font-size: 11px; color: var(--gray-m); letter-spacing: .1em; text-transform: uppercase; margin-top: 3px; }
+  .gt { height: 9px; background: var(--navy-l); border-radius: 5px; overflow: hidden; margin: .9rem 0; }
+  .gf { height: 100%; border-radius: 5px; transition: width .4s, background .4s; }
+  .glbl { display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 10px; color: var(--gray-m); margin-bottom: 1rem; }
+  .pr { display: flex; justify-content: space-between; align-items: center; padding: .55rem 0; border-top: 1px solid var(--navy-l); }
+  .prl { font-family: Arial, sans-serif; font-size: 12px; color: var(--gray-m); }
+  .prv { font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; color: var(--white); }
+  .prv.hl { color: var(--gold); }
+  .vcard { border-radius: var(--r); padding: 1.1rem 1.3rem; margin-bottom: 1rem; border: 1px solid var(--gray-l); }
+  .vp { font-family: Arial, sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .vs { font-family: Arial, sans-serif; font-size: 11px; margin-bottom: .7rem; opacity: .8; }
+  .vt { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.65; }
+  .wt { background: var(--white); border: 1px solid var(--gray-l); border-radius: var(--r); padding: .9rem 1.1rem; margin-bottom: 1rem; }
+  .wtr { display: flex; align-items: center; gap: 7px; padding: 4px 0; border-bottom: 1px solid var(--gray-l); font-family: Arial, sans-serif; font-size: 11px; }
+  .wtr:last-child { border-bottom: none; }
+  .wdot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .wn { flex: 1; color: var(--gray-d); }
+  .wbt { flex: 1; height: 3px; background: var(--gray-l); border-radius: 2px; overflow: hidden; }
+  .wbf { height: 100%; border-radius: 2px; }
+  .wp { font-weight: 700; color: var(--gray-m); min-width: 30px; text-align: right; }
+  .src { background: var(--gray-l); border-radius: var(--rs); padding: .75rem .9rem; font-family: Arial, sans-serif; font-size: 10px; color: var(--gray-m); line-height: 1.7; }
+  .src strong { display: block; margin-bottom: 3px; color: var(--gray-d); text-transform: uppercase; letter-spacing: .08em; font-size: 10px; }
+  footer { background: var(--navy); border-top: 1px solid var(--navy-l); padding: 1rem 2.5rem; display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 11px; color: var(--gray-m); }
+  footer a { color: var(--gold-l); text-decoration: none; }
+  @media(max-width:768px){main{grid-template-columns:1fr;padding:1.2rem;}.rp{position:static;}.pgrid{grid-template-columns:repeat(2,1fr);}.dgrid{grid-template-columns:1fr;}header,. hero{padding:1rem 1.2rem;}.hero h1{font-size:19px;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <svg width="160" height="42" viewBox="0 0 484.95 251.15" xmlns="http://www.w3.org/2000/svg" aria-label="Urbest"><defs><style>.cls-1{fill:#fff;}.cls-2{fill:#38d1dd;}.cls-3{fill:#1db9ef;}.cls-4{fill:#5ae5b7;}</style></defs><path class="cls-1" d="M203.81,144.49v-4a18.64,18.64,0,0,1-14,6c-8.74,0-12.86-4.79-12.86-12.53V106.71a1,1,0,0,1,1-1h8.43a1,1,0,0,1,1,1v23.13c0,5.53,2.89,7.34,7.34,7.34a11.76,11.76,0,0,0,9.07-4.53V106.71a1,1,0,0,1,1-1h8.43a1,1,0,0,1,1,1v37.78a1,1,0,0,1-1,1h-8.43A1,1,0,0,1,203.81,144.49Z"/><path class="cls-1" d="M223.23,144.49V106.71a1,1,0,0,1,1-1h8.43a1,1,0,0,1,1,1v4.42a17.36,17.36,0,0,1,11.57-6.38,1,1,0,0,1,1.12,1v8a1,1,0,0,1-1.12,1c-.53,0-1.12-.07-1.77-.07-3.46,0-8.07,2-9.8,4.53v25.28a1,1,0,0,1-1,1h-8.43A1,1,0,0,1,223.23,144.49Z"/><path class="cls-1" d="M252.9,144.49V91.54a1,1,0,0,1,1-1h8.43a1,1,0,0,1,1,1V110.8a15.34,15.34,0,0,1,12.28-6.1c10.14,0,17.65,7.91,17.65,20.94,0,13.27-7.59,20.86-17.65,20.86a15.47,15.47,0,0,1-12.28-6.1v4.09a1,1,0,0,1-1,1h-8.43A1,1,0,0,1,252.9,144.49Zm19.46-7.31c6.1,0,10.14-4.62,10.14-11.54s-4-11.62-10.14-11.62a11.55,11.55,0,0,0-9,4.61v14.1A11.68,11.68,0,0,0,272.36,137.18Z"/><path class="cls-1" d="M298.66,125.56c0-11.54,8.49-20.86,20.6-20.86,11.88,0,19.95,8.9,19.95,21.93v1.29a1,1,0,0,1-1,1H309.62c.66,5,4.7,9.23,11.46,9.23a17.65,17.65,0,0,0,9.8-3.24,1,1,0,0,1,1.47.22l3.46,5.07a1,1,0,0,1-.21,1.38c-4,3.22-9.86,4.9-15.68,4.9C307.81,146.5,298.66,138.33,298.66,125.56ZM319.26,113c-6.51,0-9.31,4.86-9.81,8.82h19.62C328.83,118.06,326.19,113,319.26,113Z"/><path class="cls-1" d="M343.07,139.58l3.46-5.59a1,1,0,0,1,1.51-.26,23,23,0,0,0,12.88,4.69c4.53,0,6.68-1.82,6.68-4.29,0-6.59-23.66-1.24-23.66-16.9,0-6.68,5.85-12.53,16.32-12.53a25.51,25.51,0,0,1,15.36,4.89,1,1,0,0,1,.26,1.33l-3.1,5.28a1,1,0,0,1-1.52.28,17.43,17.43,0,0,0-10.92-3.78c-3.79,0-6.26,1.73-6.26,4,0,5.94,23.57,1,23.57,17.07,0,7.25-6.18,12.78-17.23,12.78-6.57,0-12.93-2.09-17.15-5.62A1,1,0,0,1,343.07,139.58Z"/><path class="cls-1" d="M387.46,135.61V114.84h-5.57a1,1,0,0,1-1-1v-7.11a1,1,0,0,1,1-1h5.57V95.83a1,1,0,0,1,1-1H397a1,1,0,0,1,1,1v9.86h7.06a1,1,0,0,1,1,1v7.11a1,1,0,0,1-1,1H398v18c0,2.47,1.32,4.37,3.63,4.37a6.82,6.82,0,0,0,2.59-.51,1,1,0,0,1,1.4.65l1.68,6a1,1,0,0,1-.37,1.1c-1.64,1.19-4.29,2.11-8.18,2.11C391.42,146.5,387.46,142.7,387.46,135.61Z"/><circle class="cls-2" cx="95.99" cy="102.29" r="18.41"/><path class="cls-2" d="M77.58,102l0,25.71a.45.45,0,0,0,.81.29c1.85-2.33,7.09-7.31,18.17-7.31"/><circle class="cls-3" cx="95.99" cy="148.86" r="18.41"/><path class="cls-3" d="M104.88,165l22.37-12.81a.46.46,0,0,0-.15-.85c-9-1.52-10.81-7.42-18.27-15.6"/><circle class="cls-4" cx="136.27" cy="125.52" r="18.41"/><path class="cls-4" d="M145.72,109.71,123.48,96.9a.46.46,0,0,0-.65.56c1.08,2.76,2.75,9.77-2.8,19.37"/></svg>
+  </div>
+</header>
+<div class="hero">
+  <h1>Simulateur de propension à choisir<br>l'<em>enseignement privé</em> en France</h1>
+  <p>Ajustez les cinq facteurs structurels pour estimer la probabilité qu'un foyer scolarise son enfant dans le secteur privé. Modèle calibré sur les données DEPP 2025, INSEE Filosofi 2021 et la littérature académique.</p>
+  <div class="disc">Modèle illustratif à visée pédagogique — les pondérations reflètent les ordres de grandeur de la littérature existante et ne constituent pas une estimation économétrique empirique sur microdonnées.</div>
+</div>
+<main>
+  <div>
+    <p class="stitle">Profils types préchargés</p>
+    <div class="pgrid">
+      <button class="pbtn" onclick="loadP('cadre_paris',this)"><span class="pi">&#128188;</span>Cadre parisien</button>
+      <button class="pbtn" onclick="loadP('classe_moy',this)"><span class="pi">&#127968;</span>Classe moy. province</button>
+      <button class="pbtn" onclick="loadP('enseignant',this)"><span class="pi">&#128218;</span>Parent enseignant</button>
+      <button class="pbtn" onclick="loadP('religieux',this)"><span class="pi">&#10022;</span>Motif confessionnel</button>
+      <button class="pbtn" onclick="loadP('securite',this)"><span class="pi">&#9757;</span>Fuite école difficile</button>
+      <button class="pbtn" onclick="loadP('modeste',this)"><span class="pi">&#128100;</span>Milieu modeste</button>
+    </div>
+    <p class="stitle">Les cinq facteurs — ajustez chaque dimension</p>
+    <div class="flist">
+
+      <!-- F1 -->
+      <div class="fc">
+        <div class="ftop">
+          <div class="fn"><span style="width:10px;height:10px;border-radius:2px;background:var(--c1);display:inline-block;flex-shrink:0;"></span>F1 — Niveau de revenus<span class="fw" style="background:var(--c1);">Poids 28%</span></div>
+          <div class="fsd" id="s1d">50</div>
+        </div>
+        <div class="fbt"><div class="fbf" id="b1" style="background:var(--c1);width:50%"></div></div>
+        <div class="dgrid">
+          <div class="dim">
+            <div class="dlbl">Revenu annuel du foyer (UC)</div>
+            <div class="drow"><span class="dq" id="q1a">~23 000 € / an</span><span class="dp" id="p1a">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r1a" oninput="upd()">
+            <div class="sticks"><span class="st">&lt;12k€</span><span class="st med">23k€ méd.</span><span class="st">100k€+</span></div>
+          </div>
+          <div class="dim">
+            <div class="dlbl">Effort financier consenti</div>
+            <div class="drow"><span class="dq" id="q1b">~700 € / an</span><span class="dp" id="p1b">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r1b" oninput="upd()">
+            <div class="sticks"><span class="st">Refus</span><span class="st med">~700€/an</span><span class="st">8k€+/an</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- F2 -->
+      <div class="fc">
+        <div class="ftop">
+          <div class="fn"><span style="width:10px;height:10px;border-radius:2px;background:var(--c2);display:inline-block;flex-shrink:0;"></span>F2 — Niveau d'études des parents<span class="fw" style="background:var(--c2);">Poids 22%</span></div>
+          <div class="fsd" id="s2d">50</div>
+        </div>
+        <div class="fbt"><div class="fbf" id="b2" style="background:var(--c2);width:50%"></div></div>
+        <div class="dgrid">
+          <div class="dim">
+            <div class="dlbl">Diplôme le plus élevé</div>
+            <div class="drow"><span class="dq" id="q2a">Bac+2/3</span><span class="dp" id="p2a">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r2a" oninput="upd()">
+            <div class="sticks"><span class="st">Sans diplôme</span><span class="st med">BTS/Licence</span><span class="st">Bac+5/GE</span></div>
+          </div>
+          <div class="dim">
+            <div class="dlbl">Capital culturel du foyer</div>
+            <div class="drow"><span class="dq" id="q2b">Moyen</span><span class="dp" id="p2b">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r2b" oninput="upd()">
+            <div class="sticks"><span class="st">Faible</span><span class="st med">Médian</span><span class="st">Très élevé</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- F3 -->
+      <div class="fc">
+        <div class="ftop">
+          <div class="fn"><span style="width:10px;height:10px;border-radius:2px;background:var(--c3);display:inline-block;flex-shrink:0;"></span>F3 — Attentes académiques<span class="fw" style="background:var(--c3);">Poids 20%</span></div>
+          <div class="fsd" id="s3d">50</div>
+        </div>
+        <div class="fbt"><div class="fbf" id="b3" style="background:var(--c3);width:50%"></div></div>
+        <div class="dgrid">
+          <div class="dim">
+            <div class="dlbl">Ambition études supérieures</div>
+            <div class="drow"><span class="dq" id="q3a">Licence / BTS</span><span class="dp" id="p3a">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r3a" oninput="upd()">
+            <div class="sticks"><span class="st">Bac suffit</span><span class="st med">Licence</span><span class="st">GE/CPGE</span></div>
+          </div>
+          <div class="dim">
+            <div class="dlbl">Résultats scolaires de l'enfant</div>
+            <div class="drow"><span class="dq" id="q3b">Dans la moyenne</span><span class="dp" id="p3b">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r3b" oninput="upd()">
+            <div class="sticks"><span class="st">Difficultés</span><span class="st med">Moyen</span><span class="st">Excellent</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- F4 -->
+      <div class="fc">
+        <div class="ftop">
+          <div class="fn"><span style="width:10px;height:10px;border-radius:2px;background:var(--c4);display:inline-block;flex-shrink:0;"></span>F4 — Sécurité et environnement perçus<span class="fw" style="background:var(--c4);">Poids 17%</span></div>
+          <div class="fsd" id="s4d">50</div>
+        </div>
+        <div class="fbt"><div class="fbf" id="b4" style="background:var(--c4);width:50%"></div></div>
+        <div class="dgrid">
+          <div class="dim">
+            <div class="dlbl">Qualité école publique locale</div>
+            <div class="drow"><span class="dq" id="q4a">IPS ~100–110</span><span class="dp" id="p4a">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r4a" oninput="upd()">
+            <div class="sticks"><span class="st">REP+ (IPS&lt;80)</span><span class="st med">IPS 100–110</span><span class="st">IPS 140+</span></div>
+          </div>
+          <div class="dim">
+            <div class="dlbl">Perception du climat scolaire</div>
+            <div class="drow"><span class="dq" id="q4b">Acceptable</span><span class="dp" id="p4b">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r4b" oninput="upd()">
+            <div class="sticks"><span class="st">Insécure / évité</span><span class="st med">Correct</span><span class="st">Très serein</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- F5 -->
+      <div class="fc">
+        <div class="ftop">
+          <div class="fn"><span style="width:10px;height:10px;border-radius:2px;background:var(--c5);display:inline-block;flex-shrink:0;"></span>F5 — Réseau social et pairs<span class="fw" style="background:var(--c5);">Poids 13%</span></div>
+          <div class="fsd" id="s5d">50</div>
+        </div>
+        <div class="fbt"><div class="fbf" id="b5" style="background:var(--c5);width:50%"></div></div>
+        <div class="dgrid">
+          <div class="dim">
+            <div class="dlbl">Part de l'entourage dans le privé</div>
+            <div class="drow"><span class="dq" id="q5a">~20% des proches</span><span class="dp" id="p5a">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r5a" oninput="upd()">
+            <div class="sticks"><span class="st">0% (aucun)</span><span class="st med">~20%</span><span class="st">Majorité</span></div>
+          </div>
+          <div class="dim">
+            <div class="dlbl">Importance accordée au réseau de pairs</div>
+            <div class="drow"><span class="dq" id="q5b">Modérée</span><span class="dp" id="p5b">50/100</span></div>
+            <input type="range" min="0" max="100" value="50" step="1" id="r5b" oninput="upd()">
+            <div class="sticks"><span class="st">Indifférent</span><span class="st med">Important</span><span class="st">Décisif</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="rp">
+    <div class="scard">
+      <div style="font-family:Arial,sans-serif;font-size:10px;color:var(--gray-m);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.2rem;">Score de propension global</div>
+      <div class="smain">
+        <div class="snum" id="sv">50</div>
+        <div class="slbl">/ 100 points</div>
+      </div>
+      <div class="gt"><div class="gf" id="gf" style="width:50%;background:var(--gold);"></div></div>
+      <div class="glbl"><span>Faible</span><span>Modéré</span><span>Fort</span></div>
+      <div class="pr"><span class="prl">Probabilité estimée privé</span><span class="prv hl" id="pv">21%</span></div>
+      <div class="pr"><span class="prl">Référence nationale (DEPP 2025)</span><span class="prv">21%</span></div>
+      <div class="pr"><span class="prl">Écart vs nationale</span><span class="prv" id="ev">0 pts</span></div>
+    </div>
+
+    <div class="vcard" id="vc">
+      <div class="vp" id="vp">Propension modérée</div>
+      <div class="vs" id="vss">Zone d'arbitrage</div>
+      <div class="vt" id="vt">Décision indécise — forte sensibilité au contexte local.</div>
+    </div>
+
+    <div class="wt">
+      <p class="stitle" style="margin-bottom:.7rem;">Pondérations du modèle</p>
+      <div class="wtr"><div class="wdot" style="background:var(--c1);"></div><div class="wn">F1 — Revenus</div><div class="wbt"><div class="wbf" style="width:28%;background:var(--c1);"></div></div><div class="wp">28%</div></div>
+      <div class="wtr"><div class="wdot" style="background:var(--c2);"></div><div class="wn">F2 — Études parents</div><div class="wbt"><div class="wbf" style="width:22%;background:var(--c2);"></div></div><div class="wp">22%</div></div>
+      <div class="wtr"><div class="wdot" style="background:var(--c3);"></div><div class="wn">F3 — Attentes académiques</div><div class="wbt"><div class="wbf" style="width:20%;background:var(--c3);"></div></div><div class="wp">20%</div></div>
+      <div class="wtr"><div class="wdot" style="background:var(--c4);"></div><div class="wn">F4 — Sécurité perçue</div><div class="wbt"><div class="wbf" style="width:17%;background:var(--c4);"></div></div><div class="wp">17%</div></div>
+      <div class="wtr"><div class="wdot" style="background:var(--c5);"></div><div class="wn">F5 — Réseau social</div><div class="wbt"><div class="wbf" style="width:13%;background:var(--c5);"></div></div><div class="wp">13%</div></div>
+    </div>
+
+    <div class="src">
+      <strong>Sources (annexe)</strong>
+      DEPP, Repères et références statistiques 2024<br>
+      INSEE Filosofi 2021 — niveaux de vie par UC<br>
+      RessourSES, Ségrégation socio-scolaire public/privé, 2023<br>
+      Fondation pour l'École, Rentrée 2024<br>
+      PISA 2022 France, OCDE<br>
+      Cour des comptes, Enseignement privé sous contrat, 2023<br><br>
+      <em>P(privé) = σ(−2,2 + (score−50)×0,07)<br>Calé sur P=21% au score médian (DEPP 2025)</em>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>Modèle illustratif — usage éducatif et analytique</span>
+  <span>Contact : <a href="mailto:hugo@urbest.io">hugo@urbest.io</a></span>
+</footer>
+
+<script>
+const W={f1:.28,f2:.22,f3:.20,f4:.17,f5:.13};
+
+// Income scale: 0→<12k, 50→23k (national median), 100→100k+ (top 5% C95)
+// Uses a piecewise linear interpolation anchored on INSEE deciles
+function incomeLabel(v){
+  if(v<=5)  return '<12 000 €/an';
+  if(v<=15) return '12 000–14 000 €/an';
+  if(v<=25) return '14 000–16 000 €/an';
+  if(v<=35) return '16 000–19 000 €/an';
+  if(v<=45) return '19 000–22 000 €/an';
+  if(v<=55) return '~23 000 € (méd. nat.)';
+  if(v<=65) return '26 000–32 000 €/an';
+  if(v<=75) return '32 000–45 000 €/an';
+  if(v<=85) return '45 000–65 000 €/an';
+  if(v<=92) return '65 000–100 000 €/an';
+  return '100 000 €+/an';
+}
+
+const Q={
+  r1a: v=>incomeLabel(v),
+  r1b: v=>v<=10?'Refus total':v<=25?'<300 €/an':v<=40?'300–600 €/an':v<=55?'~700 €/an':v<=70?'1 500–3 000 €/an':v<=85?'3 000–6 000 €/an':'6 000–16 000 €/an',
+  r2a: v=>v<=10?'Sans diplôme':v<=22?'CAP / BEP':v<=38?'Baccalauréat':v<=52?'Bac+2 / Bac+3':v<=68?'Master / Bac+5':v<=82?'Grande école':v<=92?'Doctorat':'Grande école d\'élite',
+  r2b: v=>v<=15?'Très faible':v<=35?'Faible':v<=52?'Moyen':v<=68?'Élevé':v<=82?'Très élevé':'Exceptionnel',
+  r3a: v=>v<=15?'Arrêt avant bac':v<=28?'Bac professionnel':v<=45?'BTS / Licence':v<=60?'Master / Ingénieur':v<=78?'Grande école':'CPGE / Top grande école',
+  r3b: v=>v<=15?'Très en difficulté':v<=30?'En difficulté':v<=52?'Dans la moyenne':v<=68?'Bon élève':v<=84?'Très bon':'Excellent / mention très bien',
+  r4a: v=>v<=15?'REP+ (IPS < 80)':v<=30?'Éducation prioritaire (IPS 80–95)':v<=52?'IPS 100–110 (national median)':v<=68?'IPS 115–125':v<=82?'IPS 125–135':'IPS 140+ (établissement d\'élite)',
+  r4b: v=>v<=15?'Très insécure — établissement évité':v<=30?'Climat dégradé':v<=52?'Acceptable':v<=68?'Bon':v<=84?'Très serein':'Cadre exemplaire',
+  r5a: v=>v<=10?'0% — aucun proche dans le privé':v<=28?'< 10% des proches':v<=52?'~20% des proches':v<=68?'~40% des proches':v<=84?'Majorité des proches':'Quasi-totalité de l\'entourage',
+  r5b: v=>v<=15?'Indifférent':v<=30?'Peu important':v<=52?'Modéré':v<=68?'Important':v<=84?'Très important':'Décisif — critère n°1',
+};
+
+function gv(id){return parseInt(document.getElementById(id).value);}
+function sv(id,v){document.getElementById(id).value=v;}
+function sig(x){return 1/(1+Math.exp(-x));}
+function gc(s){if(s<30)return'#888780';if(s<50)return'#BA7517';if(s<70)return'#378ADD';return'#534AB7';}
+
+function upd(){
+  const ids=['r1a','r1b','r2a','r2b','r3a','r3b','r4a','r4b','r5a','r5b'];
+  ids.forEach(id=>{
+    const n=id.slice(1);
+    const v=gv(id);
+    const qe=document.getElementById('q'+n);
+    const pe=document.getElementById('p'+n);
+    if(qe)qe.textContent=Q[id](v);
+    if(pe)pe.textContent=v+'/100';
+  });
+
+  const s=[1,2,3,4,5].map(i=>Math.round((gv('r'+i+'a')+gv('r'+i+'b'))/2));
+  s.forEach((v,i)=>{
+    document.getElementById('s'+(i+1)+'d').textContent=v;
+    document.getElementById('b'+(i+1)).style.width=v+'%';
+  });
+
+  const score=Math.round(s[0]*W.f1+s[1]*W.f2+s[2]*W.f3+s[3]*W.f4+s[4]*W.f5);
+  const proba=Math.round(sig(-2.2+(score-50)*0.07)*100);
+  const ecart=proba-21;
+
+  document.getElementById('sv').textContent=score;
+  document.getElementById('pv').textContent=proba+'%';
+  document.getElementById('ev').textContent=(ecart>=0?'+':'')+ecart+' pts';
+  document.getElementById('ev').style.color=ecart>5?'#C8A96E':ecart<-5?'#888780':'#fff';
+  document.getElementById('gf').style.width=score+'%';
+  document.getElementById('gf').style.background=gc(score);
+
+  const vc=document.getElementById('vc');
+  const vp=document.getElementById('vp');
+  const vss=document.getElementById('vss');
+  const vt=document.getElementById('vt');
+
+  let ptxt,psub,vbg,vcol,vtxt;
+  if(score>=75){ptxt='Très forte propension';psub='Profil cadre supérieur / dirigeant';vbg='#EEEDFE';vcol='#26215C';vtxt='<strong>Scolarisation dans le privé très probable.</strong> Ce profil cumule les déterminants classiques identifiés par la DEPP : revenus élevés, capital culturel fort, ambition grande école et réseau ancré dans le privé. L\'établissement est perçu comme un investissement de long terme dans le capital humain de l\'enfant.';}
+  else if(score>=58){ptxt='Propension élevée';psub='Classes moyennes supérieures';vbg='#E6F1FB';vcol='#042C53';vtxt='<strong>Inclination marquée vers le privé.</strong> Le budget est mobilisable mais l\'effort financier reste significatif (1–2% du revenu disponible). La décision est souvent déclenchée par un facteur prioritaire — sécurité perçue de l\'école locale ou réseau social — plutôt que par la totalité des critères.';}
+  else if(score>=42){ptxt='Propension modérée';psub='Zone d\'arbitrage';vbg='#FAEEDA';vcol='#412402';vtxt='<strong>Décision indécise — forte sensibilité au contexte local.</strong> Le privé est une option envisagée, non une évidence. La réputation de l\'école publique locale et l\'accessibilité géographique jouent un rôle déterminant. Profil de la classe moyenne française.';}
+  else if(score>=25){ptxt='Faible propension';psub='Contrainte financière dominante';vbg='#EAF3DE';vcol='#173404';vtxt='<strong>L\'école publique reste le choix naturel.</strong> La contrainte budgétaire est le premier frein. Le privé sous contrat reste accessible si les frais sont inférieurs à 500€/an et l\'établissement géographiquement proche.';}
+  else{ptxt='Très faible propension';psub='École publique par défaut';vbg='#F1EFE8';vcol='#2C2C2A';vtxt='<strong>Le choix du privé est absent de l\'horizon décisionnel.</strong> Aucun des cinq facteurs ne crée de pression suffisante. Profil représentatif des 79% de familles françaises restant dans l\'enseignement public (DEPP 2025).';}
+
+  vp.textContent=ptxt; vp.style.color=vcol;
+  vss.textContent=psub; vss.style.color=vcol;
+  vt.innerHTML=vtxt; vt.style.color=vcol;
+  vc.style.cssText='border-radius:var(--r);padding:1.1rem 1.3rem;margin-bottom:1rem;border:1px solid '+vbg+';background:'+vbg+';';
+}
+
+const PROFILS={
+  cadre_paris:  {r1a:88,r1b:82,r2a:85,r2b:82,r3a:85,r3b:75,r4a:55,r4b:70,r5a:78,r5b:80},
+  classe_moy:   {r1a:48,r1b:45,r2a:55,r2b:50,r3a:60,r3b:58,r4a:65,r4b:68,r5a:40,r5b:38},
+  enseignant:   {r1a:52,r1b:55,r2a:90,r2b:85,r3a:80,r3b:78,r4a:50,r4b:55,r5a:55,r5b:60},
+  religieux:    {r1a:55,r1b:60,r2a:58,r2b:52,r3a:50,r3b:55,r4a:60,r4b:65,r5a:72,r5b:75},
+  securite:     {r1a:45,r1b:50,r2a:42,r2b:40,r3a:55,r3b:48,r4a:90,r4b:92,r5a:50,r5b:45},
+  modeste:      {r1a:15,r1b:10,r2a:20,r2b:18,r3a:30,r3b:28,r4a:45,r4b:40,r5a:15,r5b:12},
+};
+
+function loadP(key,btn){
+  document.querySelectorAll('.pbtn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  Object.entries(PROFILS[key]).forEach(([id,v])=>sv(id,v));
+  upd();
+}
+
+upd();
+</script>
+</body>
+</html>
